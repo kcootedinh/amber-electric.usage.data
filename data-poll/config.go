@@ -11,6 +11,7 @@ type Config struct {
 	ServerUrl string
 	ApiKey    string
 	Site      string
+	Frequency int
 	LogLevel  slog.Level
 }
 
@@ -30,6 +31,17 @@ func loadConfig(getenv func(string) string) (Config, error) {
 		return Config{}, fmt.Errorf("SITE not set")
 	}
 
+	frequency, ok := os.LookupEnv("JOB_FREQUENCY")
+	if !ok {
+		frequency = "0"
+	}
+
+	frequencyInt, err := strconv.ParseInt(frequency, 10, 32)
+	if err != nil {
+		slog.Error(fmt.Sprintf("failed to parse JOB_FREQUENCY, %s", err.Error()))
+		frequencyInt = 0
+	}
+
 	logLevel, ok := os.LookupEnv("LOG_LEVEL")
 	if !ok {
 		logLevel = "0"
@@ -45,6 +57,7 @@ func loadConfig(getenv func(string) string) (Config, error) {
 		ServerUrl: url,
 		ApiKey:    apiKey,
 		Site:      site,
+		Frequency: int(frequencyInt),
 		LogLevel:  slog.Level(logLevelInt),
 	}, nil
 }
