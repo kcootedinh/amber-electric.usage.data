@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/go-co-op/gocron/v2"
-	"github.com/google/uuid"
 	"io"
 	"log/slog"
 	"os"
@@ -12,6 +10,8 @@ import (
 	"time"
 
 	"amber-electric.usage.data/internal/amber"
+	"github.com/go-co-op/gocron/v2"
+	"github.com/google/uuid"
 )
 
 func run(ctx context.Context, w io.Writer, getenv func(string) string) error {
