@@ -3,27 +3,31 @@ package main
 import (
 	"fmt"
 	"log/slog"
-	"os"
 	"strconv"
 )
 
 type Config struct {
-	ServerUrl string
-	ApiKey    string
-	Site      string
-	Frequency int
-	LogLevel  slog.Level
+	AmberUrl    string
+	AmberApiKey string
+	Site        string
+	Frequency   int
+	DbHost      string
+	DbPort      int
+	DbName      string
+	DbUser      string
+	DbPassord   string
+	LogLevel    slog.Level
 }
 
 func loadConfig(getenv func(string) string) (Config, error) {
-	url := getenv("SERVER_URL")
+	url := getenv("AMBER_URL")
 	if url == "" {
-		return Config{}, fmt.Errorf("SERVER_URL not set")
+		return Config{}, fmt.Errorf("AMBER_URL not set")
 	}
 
-	apiKey := getenv("API_KEY")
+	apiKey := getenv("AMBER_API_KEY")
 	if apiKey == "" {
-		return Config{}, fmt.Errorf("API_KEY not set")
+		return Config{}, fmt.Errorf("AMBER_API_KEY not set")
 	}
 
 	site := getenv("SITE")
@@ -31,9 +35,34 @@ func loadConfig(getenv func(string) string) (Config, error) {
 		return Config{}, fmt.Errorf("SITE not set")
 	}
 
-	frequency, ok := os.LookupEnv("JOB_FREQUENCY")
-	if !ok {
+	frequency := getenv("JOB_FREQUENCY")
+	if frequency == "" {
 		frequency = "0"
+	}
+
+	dbHost := getenv("DB_HOST")
+	if dbHost == "" {
+		return Config{}, fmt.Errorf("DB_HOST not set")
+	}
+
+	dbPort, err := strconv.Atoi(getenv("DB_PORT"))
+	if err != nil {
+		return Config{}, fmt.Errorf("DB_PORT not an integer")
+	}
+
+	dbName := getenv("DB_NAME")
+	if dbName == "" {
+		return Config{}, fmt.Errorf("DB_NAME not set")
+	}
+
+	dbUser := getenv("DB_USER")
+	if dbUser == "" {
+		return Config{}, fmt.Errorf("DB_USER not set")
+	}
+
+	dbPassord := getenv("DB_PASSORD")
+	if dbPassord == "" {
+		return Config{}, fmt.Errorf("DB_PASSORd not set")
 	}
 
 	frequencyInt, err := strconv.ParseInt(frequency, 10, 32)
@@ -42,8 +71,8 @@ func loadConfig(getenv func(string) string) (Config, error) {
 		frequencyInt = 0
 	}
 
-	logLevel, ok := os.LookupEnv("LOG_LEVEL")
-	if !ok {
+	logLevel := getenv("LOG_LEVEL")
+	if logLevel == "" {
 		logLevel = "0"
 	}
 
@@ -54,10 +83,15 @@ func loadConfig(getenv func(string) string) (Config, error) {
 	}
 
 	return Config{
-		ServerUrl: url,
-		ApiKey:    apiKey,
-		Site:      site,
-		Frequency: int(frequencyInt),
-		LogLevel:  slog.Level(logLevelInt),
+		AmberUrl:    url,
+		AmberApiKey: apiKey,
+		Site:        site,
+		Frequency:   int(frequencyInt),
+		DbHost:      dbHost,
+		DbPort:      dbPort,
+		DbName:      dbName,
+		DbUser:      dbUser,
+		DbPassord:   dbPassord,
+		LogLevel:    slog.Level(logLevelInt),
 	}, nil
 }
