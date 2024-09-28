@@ -3,9 +3,12 @@ package amber
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/avast/retry-go/v4"
 )
 
 type Usage struct {
@@ -34,18 +37,38 @@ const resolution = "30"
 
 func (a amber) GetUsage(startDate, endDate time.Time) ([]Usage, error) {
 	usageURL := a.constructURL(startDate, endDate)
-	req, err := createRequest(usageURL, a.ApiKey)
+
+	body, err := retry.DoWithData(
+		func() ([]byte, error) {
+			req, err := createRequest(usageURL, a.ApiKey)
+			if err != nil {
+				return nil, fmt.Errorf("error constructing usage request: %w", err)
+			}
+
+			res, err := a.Client.Do(req)
+			if err != nil {
+				return nil, fmt.Errorf("error making usage request: %w", err)
+			}
+
+			defer res.Body.Close()
+
+			if res.StatusCode != http.StatusOK {
+				return nil, fmt.Errorf("usage request unsuccessful: %s", res.Status)
+			}
+
+			return io.ReadAll(res.Body)
+		},
+	)
+
 	if err != nil {
-		return nil, fmt.Errorf("error constructing usage request: %w", err)
+		return nil, err
 	}
 
-	res, err := a.Client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error making usage request: %w", err)
+	var usages []Usage
+	if err := json.Unmarshal(body, &usages); err != nil {
+		return nil, fmt.Errorf("error parsing response: %w", err)
 	}
-	defer res.Body.Close()
-
-	return decodeResponse(res)
+	return usages, nil
 }
 
 func (a amber) constructURL(startDate, endDate time.Time) string {

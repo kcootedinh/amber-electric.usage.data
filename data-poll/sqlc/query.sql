@@ -2,6 +2,11 @@
 SELECT *
 FROM usage;
 
+-- name: GetUsagesForDate :many
+SELECT *
+FROM usage u
+WHERE u.date = $1;
+
 -- name: InsertUsage :one
 INSERT INTO usage(type,
                   duration,

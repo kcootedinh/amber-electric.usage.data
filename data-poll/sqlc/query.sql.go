@@ -11,6 +11,52 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getUsagesForDate = `-- name: GetUsagesForDate :many
+SELECT usage_id, type, duration, spotperkwh, perkwh, kwh, cost, date, nemtime, starttime, endtime, renewables, channeltype, channelidentifier, spikestatus, descriptor, quality, tariffinformation, demandwindow
+FROM usage u
+WHERE u.date = $1
+`
+
+func (q *Queries) GetUsagesForDate(ctx context.Context, date pgtype.Date) ([]Usage, error) {
+	rows, err := q.db.Query(ctx, getUsagesForDate, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Usage
+	for rows.Next() {
+		var i Usage
+		if err := rows.Scan(
+			&i.UsageID,
+			&i.Type,
+			&i.Duration,
+			&i.Spotperkwh,
+			&i.Perkwh,
+			&i.Kwh,
+			&i.Cost,
+			&i.Date,
+			&i.Nemtime,
+			&i.Starttime,
+			&i.Endtime,
+			&i.Renewables,
+			&i.Channeltype,
+			&i.Channelidentifier,
+			&i.Spikestatus,
+			&i.Descriptor,
+			&i.Quality,
+			&i.Tariffinformation,
+			&i.Demandwindow,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertUsage = `-- name: InsertUsage :one
 INSERT INTO usage(type,
                   duration,
