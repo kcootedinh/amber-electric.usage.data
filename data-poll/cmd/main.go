@@ -1,10 +1,8 @@
 package main
 
 import (
-	"amber-electric.usage.data/sqlc"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"io"
 	"log/slog"
 	"os"
@@ -12,8 +10,10 @@ import (
 	"time"
 
 	"amber-electric.usage.data/internal/amber"
+	"amber-electric.usage.data/sqlc"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func run(ctx context.Context, w io.Writer, getenv func(string) string) error {

@@ -60,9 +60,9 @@ func loadConfig(getenv func(string) string) (Config, error) {
 		return Config{}, fmt.Errorf("DB_USER not set")
 	}
 
-	dbPassord := getenv("DB_PASSORD")
+	dbPassord := getenv("DB_PASSWORD")
 	if dbPassord == "" {
-		return Config{}, fmt.Errorf("DB_PASSORd not set")
+		return Config{}, fmt.Errorf("DB_PASSWORD not set")
 	}
 
 	frequencyInt, err := strconv.ParseInt(frequency, 10, 32)
