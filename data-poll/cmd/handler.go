@@ -35,12 +35,15 @@ func handler(ctx context.Context, w io.Writer, usage amber.Service, db dbQueries
 			default:
 				_ = rl.Take()
 
-				dbUsages, err := db.GetUsagesForDate(ctx, pgtype.Date{Time: date})
+				date = date.Add(-1 * time.Hour * 24)
+
+				dbUsages, err := db.GetUsagesForDate(ctx, pgtype.Date{Time: date, Valid: true})
 				if err != nil {
 					return err
 				}
 
 				if len(dbUsages) != 0 {
+					slog.Warn(fmt.Sprintf("Found %d usages on db for date %v, skipping", len(dbUsages), date), "date", date)
 					continue
 				}
 
@@ -56,6 +59,8 @@ func handler(ctx context.Context, w io.Writer, usage amber.Service, db dbQueries
 					return nil
 				}
 
+				slog.Debug(fmt.Sprintf("inserting %d rows usage data", len(data)), "date", date)
+
 				for _, u := range data {
 					insertUsage, err := toSqlcUsage(u)
 					if err != nil {
@@ -68,8 +73,6 @@ func handler(ctx context.Context, w io.Writer, usage amber.Service, db dbQueries
 					}
 				}
 			}
-
-			date = date.Add(-1 * time.Hour * 24)
 		}
 	}
 }
