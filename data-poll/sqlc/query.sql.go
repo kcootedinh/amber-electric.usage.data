@@ -38,8 +38,8 @@ RETURNING usage_id, type, duration, spotperkwh, perkwh, kwh, cost, date, nemtime
 `
 
 type InsertUsageParams struct {
-	Type              pgtype.Text
-	Duration          pgtype.Int4
+	Type              string
+	Duration          int32
 	Spotperkwh        pgtype.Numeric
 	Perkwh            pgtype.Numeric
 	Kwh               pgtype.Numeric
@@ -49,13 +49,13 @@ type InsertUsageParams struct {
 	Starttime         pgtype.Timestamptz
 	Endtime           pgtype.Timestamptz
 	Renewables        pgtype.Numeric
-	Channeltype       pgtype.Text
-	Channelidentifier pgtype.Text
-	Spikestatus       pgtype.Text
-	Descriptor        pgtype.Text
-	Quality           pgtype.Text
+	Channeltype       string
+	Channelidentifier string
+	Spikestatus       string
+	Descriptor        string
+	Quality           string
 	Tariffinformation []byte
-	Demandwindow      pgtype.Bool
+	Demandwindow      bool
 }
 
 func (q *Queries) InsertUsage(ctx context.Context, arg InsertUsageParams) (Usage, error) {

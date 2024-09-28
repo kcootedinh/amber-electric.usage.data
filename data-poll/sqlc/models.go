@@ -10,8 +10,8 @@ import (
 
 type Usage struct {
 	UsageID           int32
-	Type              pgtype.Text
-	Duration          pgtype.Int4
+	Type              string
+	Duration          int32
 	Spotperkwh        pgtype.Numeric
 	Perkwh            pgtype.Numeric
 	Kwh               pgtype.Numeric
@@ -21,11 +21,11 @@ type Usage struct {
 	Starttime         pgtype.Timestamptz
 	Endtime           pgtype.Timestamptz
 	Renewables        pgtype.Numeric
-	Channeltype       pgtype.Text
-	Channelidentifier pgtype.Text
-	Spikestatus       pgtype.Text
-	Descriptor        pgtype.Text
-	Quality           pgtype.Text
+	Channeltype       string
+	Channelidentifier string
+	Spikestatus       string
+	Descriptor        string
+	Quality           string
 	Tariffinformation []byte
-	Demandwindow      pgtype.Bool
+	Demandwindow      bool
 }

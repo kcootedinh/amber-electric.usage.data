@@ -10,7 +10,7 @@ import (
 
 type Usage struct {
 	Type              string    `json:"type"`
-	Duration          int       `json:"duration"`
+	Duration          int32     `json:"duration"`
 	Date              string    `json:"date"`
 	EndTime           time.Time `json:"endTime"`
 	Quality           string    `json:"quality"`
