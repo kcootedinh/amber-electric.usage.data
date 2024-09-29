@@ -1,10 +1,9 @@
-package main
+package backfill
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"strconv"
 	"time"
@@ -21,60 +20,60 @@ type dbQueries interface {
 	InsertUsage(ctx context.Context, arg sqlc.InsertUsageParams) (sqlc.Usage, error)
 }
 
-func handler(ctx context.Context, w io.Writer, usage amber.Service, db dbQueries) func() error {
-	return func() error {
-		rl := ratelimit.New(1) // per second
+func Handler(ctx context.Context, usage amber.Service, db dbQueries, backfillStart string) error {
+	date, err := time.Parse(time.DateOnly, backfillStart)
+	if err != nil {
+		return fmt.Errorf("parsing backfill start date: %w", err)
+	}
 
-		// start at today
-		date := time.Now()
+	rl := ratelimit.New(1) // per second
 
-		for {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-				_ = rl.Take()
+	for ; date.Before(time.Now()); date = date.Add(time.Hour * 24) {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			_ = rl.Take()
 
-				date = date.Add(-1 * time.Hour * 24)
+			dbUsages, err := db.GetUsagesForDate(ctx, pgtype.Date{Time: date, Valid: true})
+			if err != nil {
+				return err
+			}
 
-				dbUsages, err := db.GetUsagesForDate(ctx, pgtype.Date{Time: date, Valid: true})
+			if len(dbUsages) != 0 {
+				slog.Warn(fmt.Sprintf("Found %d usages on db for date %v, skipping", len(dbUsages), date), "date", date)
+				continue
+			}
+
+			data, err := usage.GetUsage(date, date)
+
+			if err != nil {
+				slog.Error(fmt.Sprintf("failed to retrieve usage data: %s", err.Error()))
+				return err
+			}
+
+			if len(data) == 0 {
+				slog.Info(fmt.Sprintf("no usage data found for date %s", date))
+				continue
+			}
+
+			slog.Debug(fmt.Sprintf("inserting %d rows usage data", len(data)), "date", date)
+
+			for _, u := range data {
+				insertUsage, err := toSqlcUsage(u)
 				if err != nil {
 					return err
 				}
 
-				if len(dbUsages) != 0 {
-					slog.Warn(fmt.Sprintf("Found %d usages on db for date %v, skipping", len(dbUsages), date), "date", date)
-					continue
-				}
-
-				data, err := usage.GetUsage(date, date)
-
+				_, err = db.InsertUsage(ctx, insertUsage)
 				if err != nil {
-					slog.Error(fmt.Sprintf("failed to retrieve usage data: %s", err.Error()))
 					return err
-				}
-
-				if len(data) == 0 {
-					slog.Info("no usage data found")
-					return nil
-				}
-
-				slog.Debug(fmt.Sprintf("inserting %d rows usage data", len(data)), "date", date)
-
-				for _, u := range data {
-					insertUsage, err := toSqlcUsage(u)
-					if err != nil {
-						return err
-					}
-
-					_, err = db.InsertUsage(ctx, insertUsage)
-					if err != nil {
-						return err
-					}
 				}
 			}
 		}
 	}
+
+	return nil
 }
 
 func toSqlcUsage(u amber.Usage) (sqlc.InsertUsageParams, error) {

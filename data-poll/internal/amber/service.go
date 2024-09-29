@@ -3,6 +3,8 @@ package amber
 import (
 	"net/http"
 	"time"
+
+	"golang.org/x/time/rate"
 )
 
 type amber struct {
@@ -10,6 +12,7 @@ type amber struct {
 	ApiKey  string
 	Site    string
 	Client  http.Client
+	Limiter *rate.Limiter
 }
 
 type Service interface {
@@ -20,5 +23,6 @@ func NewUsageService(baseUrl, apiKey, site string) Service {
 	client := http.Client{
 		Timeout: 30 * time.Second,
 	}
-	return amber{BaseUrl: baseUrl, ApiKey: apiKey, Site: site, Client: client}
+	limiter := rate.NewLimiter(rate.Every(300*time.Second), 50) // 50 request every 300 seconds
+	return amber{BaseUrl: baseUrl, ApiKey: apiKey, Site: site, Client: client, Limiter: limiter}
 }

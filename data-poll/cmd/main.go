@@ -1,9 +1,10 @@
 package main
 
 import (
+	"amber-electric.usage.data/cmd/backfill"
+	"amber-electric.usage.data/cmd/cron"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -16,7 +17,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func run(ctx context.Context, w io.Writer, getenv func(string) string) error {
+func run(ctx context.Context, getenv func(string) string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
@@ -40,10 +41,8 @@ func run(ctx context.Context, w io.Writer, getenv func(string) string) error {
 
 	queries := sqlc.New(dbConn)
 
-	// first run
-	err = handler(ctx, w, usage, queries)()
-	if err != nil {
-		return err
+	if cfg.BackfillStart != "" {
+		return backfill.Handler(ctx, usage, queries, cfg.BackfillStart)
 	}
 
 	if cfg.Frequency <= 0 {
@@ -54,11 +53,13 @@ func run(ctx context.Context, w io.Writer, getenv func(string) string) error {
 	interval := time.Duration(cfg.Frequency) * time.Minute
 	slog.Debug(fmt.Sprintf("scheduling job every %s minutes", interval))
 
-	_, err = s.NewJob(gocron.DurationJob(interval), gocron.NewTask(handler(ctx, w, usage, queries)),
+	_, err = s.NewJob(
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(10, 30, 0))),
+		gocron.NewTask(cron.Handler(ctx, usage, queries)),
 		gocron.WithEventListeners(
 			gocron.AfterJobRunsWithError(
 				func(jobID uuid.UUID, jobName string, err error) {
-					slog.Error(fmt.Sprintf("job %s ended with error: %s", jobName, err))
+					slog.Error(fmt.Sprintf("job %s with ID %s ended with error: %s", jobName, jobID, err))
 				},
 			),
 		))
@@ -97,7 +98,7 @@ func connectDb(ctx context.Context, host string, port int, user string, password
 
 func main() {
 	ctx := context.Background()
-	if err := run(ctx, os.Stdout, os.Getenv); err != nil {
+	if err := run(ctx, os.Getenv); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}

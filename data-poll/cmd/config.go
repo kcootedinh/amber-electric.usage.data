@@ -7,16 +7,17 @@ import (
 )
 
 type Config struct {
-	AmberUrl    string
-	AmberApiKey string
-	Site        string
-	Frequency   int
-	DbHost      string
-	DbPort      int
-	DbName      string
-	DbUser      string
-	DbPassord   string
-	LogLevel    slog.Level
+	AmberUrl      string
+	AmberApiKey   string
+	Site          string
+	Frequency     int
+	DbHost        string
+	DbPort        int
+	DbName        string
+	DbUser        string
+	DbPassord     string
+	BackfillStart string
+	LogLevel      slog.Level
 }
 
 func loadConfig(getenv func(string) string) (Config, error) {
@@ -83,15 +84,16 @@ func loadConfig(getenv func(string) string) (Config, error) {
 	}
 
 	return Config{
-		AmberUrl:    url,
-		AmberApiKey: apiKey,
-		Site:        site,
-		Frequency:   int(frequencyInt),
-		DbHost:      dbHost,
-		DbPort:      dbPort,
-		DbName:      dbName,
-		DbUser:      dbUser,
-		DbPassord:   dbPassord,
-		LogLevel:    slog.Level(logLevelInt),
+		AmberUrl:      url,
+		AmberApiKey:   apiKey,
+		Site:          site,
+		Frequency:     int(frequencyInt),
+		DbHost:        dbHost,
+		DbPort:        dbPort,
+		DbName:        dbName,
+		DbUser:        dbUser,
+		DbPassord:     dbPassord,
+		BackfillStart: getenv("BACKFILL_START"),
+		LogLevel:      slog.Level(logLevelInt),
 	}, nil
 }
