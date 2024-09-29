@@ -1,6 +1,7 @@
 package amber
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -16,7 +17,7 @@ type amber struct {
 }
 
 type Service interface {
-	GetUsage(startDate, endDate time.Time) ([]Usage, error)
+	GetUsage(ctx context.Context, startDate, endDate time.Time) ([]Usage, error)
 }
 
 func NewUsageService(baseUrl, apiKey, site string) Service {

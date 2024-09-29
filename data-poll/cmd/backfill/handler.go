@@ -45,7 +45,7 @@ func Handler(ctx context.Context, usage amber.Service, db dbQueries, backfillSta
 				continue
 			}
 
-			data, err := usage.GetUsage(date, date)
+			data, err := usage.GetUsage(ctx, date, date)
 
 			if err != nil {
 				slog.Error(fmt.Sprintf("failed to retrieve usage data: %s", err.Error()))

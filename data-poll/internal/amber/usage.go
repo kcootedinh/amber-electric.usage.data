@@ -33,9 +33,9 @@ type Usage struct {
 
 const resolution = "30"
 
-func (a amber) GetUsage(startDate, endDate time.Time) ([]Usage, error) {
+func (a amber) GetUsage(ctx context.Context, startDate, endDate time.Time) ([]Usage, error) {
 	if a.Limiter != nil {
-		if err := a.Limiter.Wait(context.Background()); err != nil {
+		if err := a.Limiter.Wait(ctx); err != nil {
 			return nil, err
 		}
 	}
