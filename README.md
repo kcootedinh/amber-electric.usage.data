@@ -14,4 +14,4 @@ Evidence.dev to visualise.
 
 ## Acknowledgments
 
-Credit to Alex Potts for suggesting Evidence.dev
+Credit to [Alexander Potts](https://github.com/ajpotts01) for suggesting Evidence.dev
