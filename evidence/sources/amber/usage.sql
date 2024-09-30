@@ -1,1 +1,3 @@
-SELECT * FROM usage;
+SELECT *
+FROM usage
+WHERE channeltype = 'general';
