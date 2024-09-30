@@ -21,7 +21,7 @@ ORDER BY date desc
 
 
 ```sql usagePerHour
-SELECT date_part('hour', u.starttime) as hourOfDay, sum(u.kwh) as kwhSum
+SELECT date_part('hour', u.starttime) as hourOfDay, avg(u.kwh) * 2 as kwhAvg
 FROM usage_last_30 u
 GROUP BY date_part('hour', u.starttime)
 ORDER BY date_part('hour', u.starttime);
@@ -31,8 +31,8 @@ ORDER BY date_part('hour', u.starttime);
     data={usagePerHour}
     x=hourOfDay
     xAxisTitle="Hour of Day"
-    y=kwhSum
-    yAxisTitle="kwh used per hour"
+    y=kwhAvg
+    yAxisTitle="Average kwh used per hour"
 />
 
 ```sql pricingPerHour
