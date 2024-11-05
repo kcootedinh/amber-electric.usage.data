@@ -1,6 +1,8 @@
 {
   "name": "amber-electric-evidence-project",
   "version": "0.0.1",
+  "description": "Data visualisation for Amber Electric data",
+  "license": "MIT",
   "scripts": {
     "build": "evidence build",
     "build:strict": "evidence build:strict",
