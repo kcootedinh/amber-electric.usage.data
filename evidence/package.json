@@ -17,9 +17,9 @@
   },
   "type": "module",
   "dependencies": {
-    "@evidence-dev/core-components": "^4.8.9",
-    "@evidence-dev/evidence": "^39.1.13",
-    "@evidence-dev/postgres": "^1.0.6"
+    "@evidence-dev/core-components": "^5.1.0",
+    "@evidence-dev/evidence": "^40.0.6",
+    "@evidence-dev/postgres": "^1.0.7"
   },
   "overrides": {
     "jsonwebtoken": "9.0.0",
