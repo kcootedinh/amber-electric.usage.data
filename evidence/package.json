@@ -12,13 +12,13 @@
     "preview": "evidence preview"
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=18.0.0"
+    "npm": ">=9.0.0",
+    "node": ">=20.0.0"
   },
   "type": "module",
   "dependencies": {
     "@evidence-dev/core-components": "^5.2.2",
-    "@evidence-dev/evidence": "^40.0.6",
+    "@evidence-dev/evidence": "^40.1.2",
     "@evidence-dev/postgres": "^1.0.7"
   },
   "overrides": {
