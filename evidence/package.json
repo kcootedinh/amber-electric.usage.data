@@ -1,35 +1,36 @@
 {
-  "name": "amber-electric-evidence-project",
-  "version": "0.0.1",
-  "description": "Data visualisation for Amber Electric data",
-  "license": "MIT",
-  "scripts": {
-    "build": "evidence build",
-    "build:strict": "evidence build:strict",
-    "dev": "evidence dev --open /",
-    "test": "evidence build",
-    "sources": "evidence sources",
-    "preview": "evidence preview"
-  },
-  "engines": {
-    "npm": ">=9.0.0",
-    "node": ">=20.0.0"
-  },
-  "type": "module",
-  "dependencies": {
-    "@evidence-dev/core-components": "^5.2.2",
-    "@evidence-dev/evidence": "^40.1.2",
-    "@evidence-dev/postgres": "^1.0.7"
-  },
-  "overrides": {
-    "jsonwebtoken": "9.0.0",
-    "trim@<0.0.3": ">0.0.3",
-    "sqlite3": "5.1.5",
-    "axios": "^1.7.4",
-    "cookie@<0.7.0": "0.7.2",
-    "vite": "5.4.19",
-    "@sveltejs/kit": "2.20.6",
-    "esbuild": "0.25.0",
-    "nanoid": "5.0.9"
-  }
+    "name": "amber-electric-evidence-project",
+    "version": "0.0.1",
+    "description": "Data visualisation for Amber Electric data",
+    "license": "MIT",
+    "scripts": {
+        "build": "evidence build",
+        "build:strict": "evidence build:strict",
+        "dev": "evidence dev --open /",
+        "test": "evidence build",
+        "sources": "evidence sources",
+        "preview": "evidence preview"
+    },
+    "engines": {
+        "npm": ">=9.0.0",
+        "node": ">=20.0.0"
+    },
+    "type": "module",
+    "dependencies": {
+        "@evidence-dev/core-components": "^5.2.2",
+        "@evidence-dev/evidence": "^40.1.2",
+        "@evidence-dev/postgres": "^1.0.7"
+    },
+    "overrides": {
+        "jsonwebtoken": "9.0.0",
+        "trim@<0.0.3": ">0.0.3",
+        "sqlite3": "5.1.5",
+        "axios": "^1.7.4",
+        "cookie@<0.7.0": "0.7.2",
+        "vite": "5.4.20",
+        "@sveltejs/kit": "2.20.6",
+        "esbuild": "0.25.0",
+        "nanoid": "5.0.9",
+        "devalue": "5.3.2"
+    }
 }
